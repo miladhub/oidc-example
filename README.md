@@ -1,9 +1,12 @@
 OpenID Connect with Apache example
 ===
 
-This project represents a simple example of how to add OpenID Connect (OIDC) SSO to an app via Apache.
+This project represents a simple example of how to add OpenID Connect (OIDC) SSO to an app.
 
-The project uses the Apache module <https://github.com/zmartzone/mod_auth_openidc> to integrate with OIDC.
+The project uses:
+
+  * [mod_auth_openidc](https://github.com/zmartzone/mod_auth_openidc) as the OIDC Relying Party
+  * [Keycloak](https://www.keycloak.org) as the OIDC Provider
 
 These instructions were tested on MacOS. The app behind Apache is just a demo server that dumps all HTTP headers on the
 console. The app-specific configuration is contained in file `httpd-ssl.conf`:
@@ -62,7 +65,7 @@ Otherwise, you could just restart the Apache inside:
     nc -l -p 9176
     
 If you navigate to the app at <https://192.168.1.2/app/> the page will stay there hanging, but on the console
-you can see all HTTP headers coming through in clear text (i.e., unencrypted), which means that the Apache HTTPS proxy is working:
+you can see all HTTP headers coming through:
 
     GET / HTTP/1.1
     Host: 192.168.1.2:9176
@@ -101,10 +104,10 @@ you can see all HTTP headers coming through in clear text (i.e., unencrypted), w
     X-Forwarded-Server: 192.168.1.2
     Connection: close
 
-Notable headers:
+Most importanly:
 
-    * REMOTE_USER
-    * OIDC_access_token
+  * REMOTE_USER
+  * OIDC_access_token
 
 To logout, navigate to <https://192.168.1.2/app?logout=get>.
 
