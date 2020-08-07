@@ -6,7 +6,7 @@ This project represents a simple example of how to add OpenID Connect (OIDC) SSO
 The project uses the Apache module <https://github.com/zmartzone/mod_auth_openidc> to integrate with OIDC.
 
 These instructions were tested on MacOS. The app behind Apache is just a demo server that dumps all HTTP headers on the
-console. The app-specific configuration is contained in fil `httpd.conf`:
+console. The app-specific configuration is contained in fil `httpd-ssl.conf`:
 
     <Location /app>
       ...
