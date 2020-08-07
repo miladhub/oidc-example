@@ -8,10 +8,12 @@ The project uses the Apache module <https://github.com/zmartzone/mod_auth_openid
 These instructions were tested on MacOS. The app behind Apache is just a demo server that dumps all HTTP headers on the
 console. The app-specific configuration is contained in fil `httpd-ssl.conf`:
 
-    <Location /app>
-      ...
-      ProxyPass "http://host.docker.internal:9176"
-      ProxyPassReverse "http://host.docker.internal:9176"
+    <Location "/app">
+        AuthType openid-connect
+        Require valid-user
+        RequestHeader set REMOTE_USER %{REMOTE_USER}s
+        ProxyPass "http://192.168.1.2:9176"
+        ProxyPassReverse "http://192.168.1.2:9176"
     </Location>
 
 You can replace it by pointing at your app.
