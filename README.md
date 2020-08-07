@@ -45,6 +45,7 @@ Create the private key `server.key` and the self-signed SSL certificate `server.
     docker exec oidc apt-get install -y libapache2-mod-auth-openidc
     docker exec oidc cp /usr/lib/apache2/modules/mod_auth_openidc.so /usr/local/apache2/modules/
     docker restart oidc
+    docker logs -f oidc
     
 Note - restarting the container was necessary due to <https://github.com/zmartzone/mod_auth_openidc/issues/458>.
 Otherwise, you could just restart the Apache inside:
