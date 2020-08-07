@@ -52,8 +52,6 @@ Otherwise, you could just restart the Apache inside:
         -e KEYCLOAK_IMPORT=/tmp/realm-export.json -v /tmp/realm-export.json:/tmp/realm-export.json keycloak
     rm /tmp/realm-export.json
     
-create realm, client and user <https://www.keycloak.org/docs/latest/getting_started/>
-    
     
     
     
