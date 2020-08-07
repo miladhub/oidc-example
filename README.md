@@ -59,9 +59,9 @@ Otherwise, you could just restart the Apache inside:
         jboss/keycloak
     docker logs -f keycloak
     
-When done, create a user on the OIDC realm, so that you can use it to log into the app
-(the keycloak export does not include users).
-    
+When done, create a user on the OIDC realm at <http://localhost:8080/auth/admin/master/console/#/realms/oidc/users/>
+so that you can use it to log into the app (the keycloak export does not include users).
+
 # Installing the dummy app
 
     nc -l -p 9176
