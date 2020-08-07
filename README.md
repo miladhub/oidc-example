@@ -53,12 +53,14 @@ Otherwise, you could just restart the Apache inside:
     
 # Installing Keycloak
 
-    docker run --name keycloak -p 8080:8080 jboss/keycloak
-    docker run -e KEYCLOAK_USER=keycloak -e KEYCLOAK_PASSWORD=keycloak keycloak
-    cp realm-export.json /tmp/
-    docker run -e KEYCLOAK_USER=keycloak -e KEYCLOAK_PASSWORD=keycloak \
-        -e KEYCLOAK_IMPORT=/tmp/realm-export.json -v /tmp/realm-export.json:/tmp/realm-export.json keycloak
-    rm /tmp/realm-export.json
+    docker run -d --name keycloak -p 8080:8080 \
+        -e KEYCLOAK_USER=keycloak -e KEYCLOAK_PASSWORD=keycloak \
+        -e KEYCLOAK_IMPORT=/tmp/realm-export.json -v $(pwd)/realm-export.json:/tmp/realm-export.json \
+        jboss/keycloak
+    docker logs -f keycloak
+    
+When done, create a user on the OIDC realm, so that you can use it to log into the app
+(the keycloak export does not include users).
     
 # Installing the dummy app
 
