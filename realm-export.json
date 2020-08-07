@@ -615,7 +615,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "c08fa450-2de0-42ee-b330-dc5e6f1199bf",
       "redirectUris": [
         "https://192.168.1.2/*"
       ],
