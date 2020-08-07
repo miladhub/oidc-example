@@ -117,3 +117,4 @@ To logout, navigate to <https://192.168.1.2/app?logout=get>.
 * <https://github.com/zmartzone/mod_auth_openidc/wiki/Access-Tokens-and-Refresh-Tokens>
 * <https://github.com/zmartzone/mod_auth_openidc/issues/458>
 * <https://github.com/docker/for-win/issues/2402>
+* <https://github.com/zmartzone/mod_auth_openidc/issues/348>
