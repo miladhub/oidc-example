@@ -18,6 +18,8 @@ console. The app-specific configuration is contained in file `httpd-ssl.conf`:
 
 You can replace it by pointing at your app.
 
+Note - The project is using a real IP, 192.168.1.2, instead of localhost (didn't work otherwise).
+
 ## Creating the server private key and SSL certificate
 
 Create the private key `server.key` and the self-signed SSL certificate `server.crt` as follows:
@@ -29,7 +31,7 @@ Create the private key `server.key` and the self-signed SSL certificate `server.
     openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
     rm server.pass.key server.csr
 
-## Setting up Apache with HTTPS
+## Setting up Apache with HTTPS and the OpenID Connect Apache module
 
     docker run -dit --name oidc -p 443:443 httpd:2.4
     docker cp httpd.conf oidc:/usr/local/apache2/conf
