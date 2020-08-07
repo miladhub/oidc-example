@@ -15,13 +15,11 @@ console. The app-specific configuration is contained in file `httpd-ssl.conf`:
         AuthType openid-connect
         Require valid-user
         RequestHeader set REMOTE_USER %{REMOTE_USER}s
-        ProxyPass "http://192.168.1.2:9176"
-        ProxyPassReverse "http://192.168.1.2:9176"
+        ProxyPass "http://host.docker.internal:9176"
+        ProxyPassReverse "http://host.docker.internal:9176"
     </Location>
 
 You can replace it by pointing at your app.
-
-Note - The project is using a real IP, 192.168.1.2, instead of localhost (didn't work otherwise).
 
 ## Creating the server private key and SSL certificate
 
@@ -52,6 +50,13 @@ Otherwise, you could just restart the Apache inside:
 
     docker exec oidc apachectl restart
     
+# Making networking work from the host
+
+    echo 127.0.0.1 host.docker.internal | sudo tee -a /etc/hosts
+
+This is because the Apache module will both need to contact the OIDC provider and then redirect the browser to it
+(running on the host), so I need an address that works from both.
+
 # Installing Keycloak
 
     docker run -d --name keycloak -p 8080:8080 \
@@ -67,44 +72,45 @@ so that you can use it to log into the app (the keycloak export does not include
 
     nc -l -p 9176
     
-If you navigate to the app at <https://192.168.1.2/app/> the page will stay there hanging, but on the console
+If you navigate to the app at <https://localhost/app/> the page will stay there hanging, but on the console
 you can see all HTTP headers coming through:
 
     GET / HTTP/1.1
-    Host: 192.168.1.2:9176
+    Host: host.docker.internal:9176
     User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:79.0) Gecko/20100101 Firefox/79.0
     Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
     Accept-Language: en,en-US;q=0.8,it-IT;q=0.5,it;q=0.3
     Accept-Encoding: gzip, deflate, br
+    Referer: http://host.docker.internal:8080/
     DNT: 1
-    Cookie: mod_auth_openidc_session=fc570c0a-c00f-4ccd-b30d-1cb19919058c
+    Cookie: mod_auth_openidc_state_pI_0PcEsOCdq8GW1n5AtqitZtnQ=eyJhbGciOiAiZGlyIiwgImVuYyI6ICJBMjU2R0NNIn0..wPnMXXs48LZSSCCN.uOpBcuA5lv7Xl3oNIiQmZnbfFhAvilY9AAcBsGLGL1W7iRQJeSi9vaO51Q2I6BB5OY0Th9uMKoZEN1ufLRzjMWMGtk1iqX3-Fjq-vjdyjrZWppcB3wtWupum20b1FjVsv1Y5Sie_Po_fJIomPP0jye8UTDAgsRSjPoLpChaD_ua-JK5mm-E8SEespJ0m-Q5q1HR3dWjgmsKoTCeOcPUDqPROjFgS7ECMQYx6kLJkC_5Jeze7KF2QHgRRc0ZudA7oP2G-CvVftpKQak-AJpGSjbXzWeQGQZudc-YWsQocXHP2OneLN35PHD76HsSWNq99kPWERfu39D7ia4NhSFOeHfDE1bsuEI_BywObiPE2zdjBNAm1odM9fzuIqUHn18S-edplJdg0scuU-8ZzZg.9JwtSHVFATW2gcOLMyLvyw; mod_auth_openidc_session=a2153620-076d-49cd-9738-c04bebdae5a7
     Upgrade-Insecure-Requests: 1
-    OIDC_CLAIM_sub: 995b7562-267b-4f40-997a-f54f903fe3fd
+    OIDC_CLAIM_sub: aad7c98a-f9b3-4d09-adc4-de8c63b1680b
     OIDC_CLAIM_email_verified: 1
     OIDC_CLAIM_name: Foo Bar
     OIDC_CLAIM_preferred_username: foo
     OIDC_CLAIM_given_name: Foo
     OIDC_CLAIM_family_name: Bar
     OIDC_CLAIM_email: foo@foobar.com
-    OIDC_CLAIM_exp: 1596801497
-    OIDC_CLAIM_iat: 1596801197
-    OIDC_CLAIM_auth_time: 1596800809
-    OIDC_CLAIM_jti: 979d9a93-ed3c-4fbf-86fd-80da5beda523
-    OIDC_CLAIM_iss: http://192.168.1.2:8080/auth/realms/oidc
+    OIDC_CLAIM_exp: 1596811107
+    OIDC_CLAIM_iat: 1596810807
+    OIDC_CLAIM_auth_time: 1596810806
+    OIDC_CLAIM_jti: 66500442-e093-4f64-9cd8-7d8492a97e97
+    OIDC_CLAIM_iss: http://host.docker.internal:8080/auth/realms/oidc
     OIDC_CLAIM_aud: myapp
     OIDC_CLAIM_typ: ID
     OIDC_CLAIM_azp: myapp
-    OIDC_CLAIM_nonce: C5eCP-3PmjOq-vy8_Mkgqam73yPJSFgHWIhYfFctboo
-    OIDC_CLAIM_session_state: 58359056-1947-4093-ab6b-501479345812
-    OIDC_CLAIM_at_hash: f_oyq15ohlmJEJ6AtLUBGQ
-    OIDC_CLAIM_acr: 0
-    OIDC_access_token: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ3WjVxNzhpaTFuX3k5bHlHNVNPQXZ0b2ZtSGMzVkJsSTFzSFQzYnRaeW80In0.eyJleHAiOjE1OTY4MDE0OTcsImlhdCI6MTU5NjgwMTE5NywiYXV0aF90aW1lIjoxNTk2ODAwODA5LCJqdGkiOiJiZWZjZTEyNi0zODI4LTRjYTUtYjU2OS1hZTliOTYzMjhhZmIiLCJpc3MiOiJodHRwOi8vMTkyLjE2OC4xLjI6ODA4MC9hdXRoL3JlYWxtcy9vaWRjIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6Ijk5NWI3NTYyLTI2N2ItNGY0MC05OTdhLWY1NGY5MDNmZTNmZCIsInR5cCI6IkJlYXJlciIsImF6cCI6Im15YXBwIiwibm9uY2UiOiJDNWVDUC0zUG1qT3Etdnk4X01rZ3FhbTczeVBKU0ZnSFdJaFlmRmN0Ym9vIiwic2Vzc2lvbl9zdGF0ZSI6IjU4MzU5MDU2LTE5NDctNDA5My1hYjZiLTUwMTQ3OTM0NTgxMiIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly8xOTIuMTY4LjEuMi9hcHAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJGb28gQmFyIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZm9vIiwiZ2l2ZW5fbmFtZSI6IkZvbyIsImZhbWlseV9uYW1lIjoiQmFyIiwiZW1haWwiOiJmb29AZm9vYmFyLmNvbSJ9.CdWrKoWYqPV6rdT3v-ZrfZOcN_gfDqrrp454P2TAlzkAFXABkTp3vQsyiOSdl2jJ5Ddk-1Q3GtPQJzEuLT48yMZtl1mK3tnoBp_sP-XXr3YG_NONT73faGm81cy3dhsqpWXB4mJA2yyGamaWeRQYxh_j-Su8E7rBF_CdHd0GglwfjPiALq5nDWF0EMPM8QLGsbAr313cGxqyp1rZkIGinqrht1oh659h9P1kAaG1Rz5vvfSvAqX9Ofti_OyKaMH7mL6F0vmanstvwaziRGd05qdZSNTaqM6O6lu4n7tqrjmLsdsSxqCZ2w7-8JWueHc4sV-iqiqZE50EaU1_x84VrQ
-    OIDC_access_token_expires: 1596801497
+    OIDC_CLAIM_nonce: VF2I13j7PUR_zGS7fTj6nDf2y56Ujz0dMG6r1ELDDaM
+    OIDC_CLAIM_session_state: 5233170c-8c5e-4172-b500-b8c8a2dc52a7
+    OIDC_CLAIM_at_hash: giRR-x-V-hCF7BEU-v41Qw
+    OIDC_CLAIM_acr: 1
+    OIDC_access_token: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJDWFJxaWxEWnludGtUeFBwOWJOeWZwVmdnSEp2QklTM0JjRkRuRy1EcXJVIn0.eyJleHAiOjE1OTY4MTExMDcsImlhdCI6MTU5NjgxMDgwNywiYXV0aF90aW1lIjoxNTk2ODEwODA2LCJqdGkiOiIwNDYyMTc3MS1jMTI2LTQ2ZWYtOGI0YS0zOTQzYzcxNGE3ZTciLCJpc3MiOiJodHRwOi8vaG9zdC5kb2NrZXIuaW50ZXJuYWw6ODA4MC9hdXRoL3JlYWxtcy9vaWRjIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6ImFhZDdjOThhLWY5YjMtNGQwOS1hZGM0LWRlOGM2M2IxNjgwYiIsInR5cCI6IkJlYXJlciIsImF6cCI6Im15YXBwIiwibm9uY2UiOiJWRjJJMTNqN1BVUl96R1M3ZlRqNm5EZjJ5NTZVanowZE1HNnIxRUxERGFNIiwic2Vzc2lvbl9zdGF0ZSI6IjUyMzMxNzBjLThjNWUtNDE3Mi1iNTAwLWI4YzhhMmRjNTJhNyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9sb2NhbGhvc3QvYXBwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRm9vIEJhciIsInByZWZlcnJlZF91c2VybmFtZSI6ImZvbyIsImdpdmVuX25hbWUiOiJGb28iLCJmYW1pbHlfbmFtZSI6IkJhciIsImVtYWlsIjoiZm9vQGZvb2Jhci5jb20ifQ.Gy-BbXZLS9lS8WcsA9FCIC16AIaX5BcFKojNTwAnU1363EaGsRNsMnzxF17HNBIGU7dRhgtae2_DIwgjQ16VoGFt_V2nhxrmlL0PBADlIdGmm4ooOVS3i1SRj9Aigtv4CtTDITOX-6qxziFy90NzGPOlaUq9O1n-hwLlVfHH_Hyncgh-nh2FYk97DiDop7lAUa3FzpjKJpkatAk8P4cibk2FcsxCMy7kp-H_GRd4B7TRhZQYGvGOpWJfYaMtzqxrUPCrNFATXD3wGLBkVpGL0pKjVgzbMY90qGzpLItRjut_UMiXp9p7ka3BHdjgvw1adsmc--NFQuCt36Sxnxx4Hg
+    OIDC_access_token_expires: 1596811107
     X-Forwarded-Proto: https
     REMOTE_USER: foo
     X-Forwarded-For: 172.17.0.1
-    X-Forwarded-Host: 192.168.1.2
-    X-Forwarded-Server: 192.168.1.2
+    X-Forwarded-Host: localhost
+    X-Forwarded-Server: localhost
     Connection: close
 
 Most importanly:
@@ -112,7 +118,7 @@ Most importanly:
   * REMOTE_USER
   * OIDC_access_token
 
-To logout, navigate to <https://192.168.1.2/app?logout=get>.
+To logout, navigate to <https://localhost/app?logout=get>.
 
 ## References
 

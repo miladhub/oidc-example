@@ -609,18 +609,18 @@
       "clientId": "myapp",
       "name": "My App",
       "description": "",
-      "rootUrl": "https://192.168.1.2/app",
-      "adminUrl": "https://192.168.1.2/app",
+      "rootUrl": "https://localhost/app",
+      "adminUrl": "https://localhost/app",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "c08fa450-2de0-42ee-b330-dc5e6f1199bf",
       "redirectUris": [
-        "https://192.168.1.2/*"
+        "https://localhost/*"
       ],
       "webOrigins": [
-        "https://192.168.1.2/app"
+        "https://localhost/app"
       ],
       "notBefore": 0,
       "bearerOnly": false,
