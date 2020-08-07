@@ -52,13 +52,6 @@ Otherwise, you could just restart the Apache inside:
         -e KEYCLOAK_IMPORT=/tmp/realm-export.json -v /tmp/realm-export.json:/tmp/realm-export.json keycloak
     rm /tmp/realm-export.json
     
-    
-    
-    
-
-
-
-    
 # Installing the dummy app
 
     nc -l -p 9176
@@ -87,4 +80,11 @@ you can see all HTTP headers coming through in clear text (i.e., unencrypted), w
 * <https://devcenter.heroku.com/articles/ssl-certificate-self>
 * <https://hub.docker.com/_/httpd>
 * <https://docs.docker.com/docker-for-mac/networking/> (`host.docker.internal`)
-
+* <https://www.keycloak.org/docs/latest/securing_apps/index.html#_mod_auth_openidc>
+* <https://hub.docker.com/r/jboss/keycloak>
+* <https://github.com/zmartzone/mod_auth_openidc>
+* <https://github.com/zmartzone/mod_auth_openidc/wiki>
+* <https://github.com/Reposoft/openidc-keycloak-test>
+* <https://github.com/zmartzone/mod_auth_openidc/wiki/Access-Tokens-and-Refresh-Tokens>
+* <https://github.com/zmartzone/mod_auth_openidc/issues/458>
+* <https://github.com/docker/for-win/issues/2402>
