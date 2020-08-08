@@ -118,7 +118,7 @@ Most importanly:
   * REMOTE_USER
   * OIDC_access_token
 
-To logout, navigate to <https://localhost/app?logout=get>.
+To logout, navigate to <https://localhost/app/redirect_uri/?logout=get>.
 
 ## References
 
